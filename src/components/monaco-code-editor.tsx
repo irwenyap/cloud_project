@@ -100,7 +100,6 @@ export function MonacoCodeEditor({
           roundedSelection: false,
           renderLineHighlight: "line",
           renderWhitespace: "selection",
-          renderIndentGuides: true,
 
           wordWrap: "on",
           scrollBeyondLastLine: false,
@@ -131,3 +130,4 @@ export function MonacoCodeEditor({
     </div>
   );
 }
+
