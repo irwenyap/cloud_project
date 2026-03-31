@@ -14,12 +14,18 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 type MonacoModule = typeof import("monaco-editor");
 
 type MonacoCodeEditorProps = {
+  language: "python" | "plaintext";
   path: string;
   value: string;
   onChange?: (value: string) => void;
 };
 
-export function MonacoCodeEditor({ path, value, onChange }: MonacoCodeEditorProps) {
+export function MonacoCodeEditor({
+  language,
+  path,
+  value,
+  onChange,
+}: MonacoCodeEditorProps) {
   const handleBeforeMount = (monaco: MonacoModule) => {
     monaco.editor.defineTheme("job-runner-dark", {
       base: "vs-dark",
@@ -61,9 +67,9 @@ export function MonacoCodeEditor({ path, value, onChange }: MonacoCodeEditorProp
     <div className="h-full overflow-hidden rounded-b-2xl border border-white/8 bg-[#0f141b] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       <MonacoEditor
         beforeMount={handleBeforeMount}
-        defaultLanguage="plaintext"
+        defaultLanguage={language}
         keepCurrentModel
-        language="plaintext"
+        language={language}
         options={{
           automaticLayout: true,
           fontFamily: "var(--font-code), 'JetBrains Mono', 'Fira Code', monospace",

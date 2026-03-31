@@ -1,6 +1,10 @@
+export type DashboardFileKind = "python" | "text";
+
 export type DashboardFile = {
   id: string;
+  kind: DashboardFileKind;
   label: string;
+  language: "python" | "plaintext";
   path: string;
   content: string;
 };
@@ -16,9 +20,11 @@ export type RecentJob = {
 
 export const dashboardFiles: DashboardFile[] = [
   {
-    id: "notes",
-    label: "notes.txt",
-    path: "workspace/notes.txt",
+    id: "script-1",
+    kind: "python",
+    label: "main.py",
+    language: "python",
+    path: "workspace/main.py",
     content: "",
   },
 ];

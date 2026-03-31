@@ -106,16 +106,23 @@ export function UploadIcon() {
   );
 }
 
-type TextFileGlyphProps = {
+type FileGlyphProps = {
+  kind: "python" | "text";
   className?: string;
 };
 
-export function TextFileGlyph({ className = "" }: TextFileGlyphProps) {
+export function FileGlyph({ kind, className = "" }: FileGlyphProps) {
+  const glyphLabel = kind === "python" ? "py" : "txt";
+  const glyphTone =
+    kind === "python"
+      ? "bg-[#17324d] text-sky-200"
+      : "bg-[#2a2f3f] text-slate-200";
+
   return (
     <span
-      className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-[#17324d] text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-200 ${className}`}
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-semibold uppercase tracking-[0.18em] ${glyphTone} ${className}`}
     >
-      txt
+      {glyphLabel}
     </span>
   );
 }

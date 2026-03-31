@@ -1,4 +1,4 @@
-import { CloudIcon, SearchIcon } from "@/components/cloud-job-runner/icons";
+import { CloudIcon } from "@/components/cloud-job-runner/icons";
 
 export function DashboardTopBar() {
   return (
@@ -41,3 +41,4 @@ export function DashboardTopBar() {
     </header>
   );
 }
+
