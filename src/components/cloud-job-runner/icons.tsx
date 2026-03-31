@@ -51,6 +51,42 @@ export function CogIcon() {
   );
 }
 
+export function PlusIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M10 4.16675V15.8334M4.16669 10H15.8334"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function CloseIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="m6 6 8 8M14 6l-8 8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function UploadIcon() {
   return (
     <svg
@@ -70,9 +106,15 @@ export function UploadIcon() {
   );
 }
 
-export function TextFileGlyph() {
+type TextFileGlyphProps = {
+  className?: string;
+};
+
+export function TextFileGlyph({ className = "" }: TextFileGlyphProps) {
   return (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[#17324d] text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-200">
+    <span
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-[#17324d] text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-200 ${className}`}
+    >
       txt
     </span>
   );

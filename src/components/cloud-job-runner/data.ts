@@ -1,7 +1,6 @@
 export type DashboardFile = {
   id: string;
   label: string;
-  language: string;
   path: string;
   content: string;
 };
@@ -19,7 +18,6 @@ export const dashboardFiles: DashboardFile[] = [
   {
     id: "notes",
     label: "notes.txt",
-    language: "plaintext",
     path: "workspace/notes.txt",
     content: "",
   },

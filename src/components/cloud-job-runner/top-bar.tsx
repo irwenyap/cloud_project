@@ -18,12 +18,7 @@ export function DashboardTopBar() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="inline-flex items-center gap-2 self-start rounded-full border border-emerald-400/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300">
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.9)]" />
-          System Online
-        </div>
-
-        <label className="flex min-w-[220px] items-center gap-3 rounded-[14px] border border-white/8 bg-[#111722]/90 px-4 py-3 text-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+        {/* <label className="flex min-w-[220px] items-center gap-3 rounded-[14px] border border-white/8 bg-[#111722]/90 px-4 py-3 text-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
           <SearchIcon />
           <input
             aria-label="Search jobs"
@@ -31,9 +26,9 @@ export function DashboardTopBar() {
             defaultValue=""
             placeholder="Search"
           />
-        </label>
+        </label> */}
 
-        <button className="flex items-center gap-3 self-start rounded-[14px] border border-white/8 bg-[#111722]/90 px-3 py-2 pr-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-white/15 hover:bg-white/[0.08]">
+        {/* <button className="flex items-center gap-3 self-start rounded-[14px] border border-white/8 bg-[#111722]/90 px-3 py-2 pr-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-white/15 hover:bg-white/[0.08]">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#e9d5c2,#9fb3d7)] text-sm font-semibold text-slate-900">
             AR
           </span>
@@ -41,7 +36,7 @@ export function DashboardTopBar() {
             <span className="block text-sm font-semibold text-white">Alex R.</span>
             <span className="block text-xs text-slate-400">Workspace Owner</span>
           </span>
-        </button>
+        </button> */}
       </div>
     </header>
   );
