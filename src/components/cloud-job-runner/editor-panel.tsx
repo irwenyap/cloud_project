@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -24,7 +24,19 @@ type MenuPosition = {
   top: number;
 };
 
-export function DashboardEditorPanel() {
+type DashboardEditorPanelProps = {
+  activeJobId: string | null;
+  isPolling: boolean;
+  isSubmitting: boolean;
+  onRun: (editorText: string) => void | Promise<void>;
+};
+
+export function DashboardEditorPanel({
+  activeJobId,
+  isPolling,
+  isSubmitting,
+  onRun,
+}: DashboardEditorPanelProps) {
   const [files, setFiles] = useState(dashboardFiles);
   const [activeFileId, setActiveFileId] = useState(dashboardFiles[0]?.id ?? "");
   const [nextFileNumber, setNextFileNumber] = useState(dashboardFiles.length + 1);
@@ -176,8 +188,13 @@ export function DashboardEditorPanel() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="rounded-[14px] border border-sky-300/20 bg-[linear-gradient(180deg,#2f91ff,#1768d6)] px-5 py-3 text-sm font-semibold text-white shadow-[0_20px_30px_rgba(22,104,214,0.35)] transition hover:brightness-105">
-            Run Job
+          <button
+            type="button"
+            onClick={() => void onRun(activeFile.content)}
+            disabled={isSubmitting}
+            className="rounded-[14px] border border-sky-300/20 bg-[linear-gradient(180deg,#2f91ff,#1768d6)] px-5 py-3 text-sm font-semibold text-white shadow-[0_20px_30px_rgba(22,104,214,0.35)] transition hover:brightness-105 disabled:cursor-wait disabled:opacity-75"
+          >
+            {isSubmitting ? "Submitting..." : isPolling ? "Run Again" : "Run Job"}
           </button>
           <ControlIcon>
             <CogIcon />
@@ -246,7 +263,7 @@ export function DashboardEditorPanel() {
           </div>
         </div>
 
-        <div className="min-h-115 flex-1">
+        <div className="flex-1">
           <MonacoCodeEditor
             language={activeFile.language}
             path={activeFile.path}
@@ -255,6 +272,12 @@ export function DashboardEditorPanel() {
           />
         </div>
       </div>
+
+      {activeJobId ? (
+        <p className="mt-4 text-xs text-slate-500">
+          Active run: <span className="font-medium text-slate-300">{activeJobId}</span>
+        </p>
+      ) : null}
 
       {showCreateMenu
         ? createPortal(
@@ -281,3 +304,4 @@ export function DashboardEditorPanel() {
     </Panel>
   );
 }
+
