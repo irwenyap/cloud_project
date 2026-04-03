@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -176,14 +176,14 @@ export function DashboardEditorPanel({
   };
 
   return (
-    <Panel className="flex min-h-[620px] flex-col p-4 sm:p-5">
-      <div className="flex flex-col gap-4 border-b border-white/8 pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <Panel className="flex h-full min-h-0 flex-col overflow-hidden p-4 sm:p-5">
+      <div className="flex shrink-0 flex-col gap-4 border-b border-white/8 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-slate-400">
-            Workspace
+            Personal
           </p>
           <h2 className="mt-1 text-3xl font-semibold tracking-tight text-white">
-            Code Editor
+            Workspace
           </h2>
         </div>
 
@@ -202,7 +202,7 @@ export function DashboardEditorPanel({
         </div>
       </div>
 
-      <div className="relative mt-4 flex min-h-0 flex-1 flex-col overflow-visible pt-8">
+      <div className="relative mt-4 flex min-h-0 flex-1 flex-col overflow-hidden pt-8">
         <div className="absolute inset-x-0 top-0 z-10 flex items-end pb-4">
           <div className="min-w-0 flex max-w-full items-end overflow-x-auto">
             {files.map((file, index) => {
@@ -263,7 +263,7 @@ export function DashboardEditorPanel({
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="min-h-0 flex-1 overflow-hidden">
           <MonacoCodeEditor
             language={activeFile.language}
             path={activeFile.path}
@@ -274,7 +274,7 @@ export function DashboardEditorPanel({
       </div>
 
       {activeJobId ? (
-        <p className="mt-4 text-xs text-slate-500">
+        <p className="mt-4 shrink-0 text-xs text-slate-500">
           Active run: <span className="font-medium text-slate-300">{activeJobId}</span>
         </p>
       ) : null}
@@ -304,4 +304,3 @@ export function DashboardEditorPanel({
     </Panel>
   );
 }
-

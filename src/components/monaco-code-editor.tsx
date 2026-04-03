@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full min-h-115 items-center justify-center rounded-b-2xl border border-white/8 bg-[#0f141b] text-sm text-slate-400">
+    <div className="flex h-full min-h-0 items-center justify-center rounded-b-2xl border border-white/8 bg-[#0f141b] text-sm text-slate-400">
       Loading editor...
     </div>
   ),
@@ -64,7 +64,7 @@ export function MonacoCodeEditor({
   };
 
   return (
-    <div className="h-full overflow-hidden rounded-b-2xl border border-white/8 bg-[#0f141b] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+    <div className="h-full min-h-0 overflow-hidden rounded-b-2xl border border-white/8 bg-[#0f141b] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       <MonacoEditor
         beforeMount={handleBeforeMount}
         defaultLanguage={language}

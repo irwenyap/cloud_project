@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 
@@ -203,8 +203,8 @@ export function DashboardOutputPanel({
   const detailsValue = buildDetailsValue(activeJob, latestError);
 
   return (
-    <Panel className="flex min-h-[620px] flex-col p-4 sm:p-5 xl:col-auto lg:col-span-2">
-      <div>
+    <Panel className="flex h-full min-h-0 flex-col overflow-hidden p-4 sm:p-5 xl:col-auto lg:col-span-2">
+      <div className="shrink-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-slate-400">
           Console
         </p>
@@ -214,13 +214,13 @@ export function DashboardOutputPanel({
       </div>
 
       <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[18px] border border-[#1d2733] bg-[#05070b] shadow-[0_24px_50px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <div className="flex items-center justify-between border-b border-white/8 bg-[linear-gradient(180deg,#0a0d12,#07090d)] px-4 py-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/8 bg-[linear-gradient(180deg,#0a0d12,#07090d)] px-4 py-3">
           <p className="font-mono text-xs text-slate-500">
             runner://aws/{activeJobId ?? "idle"}
           </p>
         </div>
 
-        <div className="flex gap-2 border-b border-white/8 px-4 py-3">
+        <div className="flex shrink-0 gap-2 border-b border-white/8 px-4 py-3">
           {outputTabs.map((tab) => (
             <button
               className={`font-mono text-xs uppercase tracking-[0.18em] transition ${
@@ -238,7 +238,7 @@ export function DashboardOutputPanel({
         </div>
 
         {shouldShowEmptyState ? (
-          <div className="flex flex-1 items-center justify-center px-5 py-5">
+          <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-5">
             <EmptyState
               className="max-w-[260px]"
               description={emptyTabCopy[activeOutputTab].description}
@@ -246,8 +246,8 @@ export function DashboardOutputPanel({
             />
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.08),_transparent_34%)] px-4 py-4">
-            <pre className="min-h-full whitespace-pre-wrap break-words font-mono text-[13px] leading-6 text-emerald-200">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.08),_transparent_34%)] px-4 py-4">
+            <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-6 text-emerald-200">
               {activeOutputTab === "Output" ? outputValue : null}
               {activeOutputTab === "Logs" ? logsValue : null}
               {activeOutputTab === "Details" ? detailsValue : null}
