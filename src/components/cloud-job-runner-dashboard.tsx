@@ -8,15 +8,16 @@ import { useJobExecution } from "@/components/cloud-job-runner/use-job-execution
 
 export function CloudJobRunnerDashboard() {
   const {
-    activeJob,
-    activeJobId,
+    activeSession,
+    activeTabId,
     clearJobHistory,
-    isPolling,
+    closeTab,
     isSubmitting,
-    pollingError,
-    recentJobs,
+    jobHistory,
+    openJobTab,
+    openSessionTabs,
     runJob,
-    submitError,
+    setActiveTab,
   } = useJobExecution();
 
   return (
@@ -31,28 +32,23 @@ export function CloudJobRunnerDashboard() {
 
         <div className="mt-4 grid min-h-0 flex-1 items-stretch gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_360px]">
           <DashboardSidebar
-            activeJob={activeJob}
-            activeJobId={activeJobId}
-            isPolling={isPolling}
-            isSubmitting={isSubmitting}
+            activeTabId={activeTabId}
+            jobHistory={jobHistory}
             onClearHistory={clearJobHistory}
-            pollingError={pollingError}
-            recentJobs={recentJobs}
-            submitError={submitError}
+            onOpenJob={openJobTab}
           />
           <DashboardEditorPanel
-            activeJobId={activeJobId}
-            isPolling={isPolling}
+            activeSession={activeSession}
+            activeTabId={activeTabId}
             isSubmitting={isSubmitting}
+            onCloseTab={closeTab}
             onRun={runJob}
+            onSetActiveTab={setActiveTab}
+            openSessionTabs={openSessionTabs}
           />
           <DashboardOutputPanel
-            activeJob={activeJob}
-            activeJobId={activeJobId}
-            isPolling={isPolling}
-            isSubmitting={isSubmitting}
-            pollingError={pollingError}
-            submitError={submitError}
+            activeSession={activeSession}
+            activeTabId={activeTabId}
           />
         </div>
       </div>

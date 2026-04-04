@@ -15,16 +15,18 @@ type MonacoModule = typeof import("monaco-editor");
 
 type MonacoCodeEditorProps = {
   language: "python" | "plaintext";
-  path: string;
-  value: string;
   onChange?: (value: string) => void;
+  path: string;
+  readOnly?: boolean;
+  value: string;
 };
 
 export function MonacoCodeEditor({
   language,
-  path,
-  value,
   onChange,
+  path,
+  readOnly = false,
+  value,
 }: MonacoCodeEditorProps) {
   const handleBeforeMount = (monaco: MonacoModule) => {
     monaco.editor.defineTheme("job-runner-dark", {
@@ -72,39 +74,41 @@ export function MonacoCodeEditor({
         language={language}
         options={{
           automaticLayout: true,
+          contextmenu: true,
+          cursorBlinking: "smooth",
+          cursorSmoothCaretAnimation: "on",
+          domReadOnly: readOnly,
+          folding: false,
           fontFamily: "var(--font-code), 'JetBrains Mono', 'Fira Code', monospace",
           fontLigatures: true,
           fontSize: 17,
-          lineHeight: 30,
-          minimap: { enabled: false },
           glyphMargin: false,
-          folding: false,
+          guides: {
+            highlightActiveIndentation: true,
+            indentation: true,
+          },
+          hideCursorInOverviewRuler: true,
+          lineDecorationsWidth: 12,
+          lineHeight: 30,
           lineNumbers: "on",
           lineNumbersMinChars: 3,
-          lineDecorationsWidth: 12,
-          roundedSelection: false,
-          renderLineHighlight: "line",
-          renderWhitespace: "selection",
-          wordWrap: "on",
-          scrollBeyondLastLine: false,
-          smoothScrolling: true,
-          cursorBlinking: "smooth",
-          cursorSmoothCaretAnimation: "on",
-          padding: { top: 26, bottom: 20 },
+          matchBrackets: "always",
+          minimap: { enabled: false },
           overviewRulerBorder: false,
           overviewRulerLanes: 0,
-          hideCursorInOverviewRuler: true,
+          padding: { top: 26, bottom: 20 },
+          readOnly,
+          renderLineHighlight: "line",
+          renderWhitespace: "selection",
+          roundedSelection: false,
+          scrollBeyondLastLine: false,
           scrollbar: {
-            verticalScrollbarSize: 8,
-            horizontalScrollbarSize: 8,
             alwaysConsumeMouseWheel: false,
+            horizontalScrollbarSize: 8,
+            verticalScrollbarSize: 8,
           },
-          contextmenu: true,
-          matchBrackets: "always",
-          guides: {
-            indentation: true,
-            highlightActiveIndentation: true,
-          },
+          smoothScrolling: true,
+          wordWrap: "on",
         }}
         onChange={(nextValue) => onChange?.(nextValue ?? "")}
         path={path}

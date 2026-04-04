@@ -1,77 +1,33 @@
-﻿import { EmptyState } from "@/components/cloud-job-runner/empty-state";
-import { type RecentJob } from "@/components/cloud-job-runner/data";
-import { type DashboardJob } from "@/components/cloud-job-runner/job-api";
+import { EmptyState } from "@/components/cloud-job-runner/empty-state";
+import { type JobSession } from "@/components/cloud-job-runner/data";
 import { Panel } from "@/components/cloud-job-runner/panel";
 
-type DashboardSidebarProps = {
-  activeJob: DashboardJob | null;
-  activeJobId: string | null;
-  isPolling: boolean;
-  isSubmitting: boolean;
-  onClearHistory: () => void | Promise<void>;
-  pollingError: string | null;
-  recentJobs: RecentJob[];
-  submitError: string | null;
-};
-
-function getStatusLabel(
-  activeJob: DashboardJob | null,
-  isSubmitting: boolean,
-  isPolling: boolean,
-  submitError: string | null,
-  pollingError: string | null,
-) {
-  if (submitError) {
-    return "submit failed";
-  }
-
-  if (pollingError) {
-    return "poll failed";
-  }
-
-  if (typeof activeJob?.status === "string" && activeJob.status.trim()) {
-    return activeJob.status;
-  }
-
-  if (isSubmitting) {
-    return "submitting";
-  }
-
-  if (isPolling) {
-    return "running";
-  }
-
-  return "idle";
+function getStatusLabel(status: JobSession["status"]) {
+  return status.replace("_", " ");
 }
 
-function getStatusTone(statusLabel: string) {
-  const normalizedStatus = statusLabel.toLowerCase();
-
-  if (normalizedStatus === "completed") {
+function getStatusTone(status: JobSession["status"]) {
+  if (status === "completed") {
     return "border-emerald-400/25 bg-emerald-500/10 text-emerald-200";
   }
 
-  if (normalizedStatus === "failed" || normalizedStatus.includes("failed")) {
+  if (status === "failed" || status === "poll_failed") {
     return "border-rose-400/25 bg-rose-500/10 text-rose-200";
   }
 
-  if (
-    normalizedStatus === "running" ||
-    normalizedStatus === "submitting" ||
-    normalizedStatus === "submitted"
-  ) {
+  if (status === "running" || status === "pending" || status === "submitted") {
     return "border-sky-400/25 bg-sky-500/10 text-sky-200";
   }
 
   return "border-white/10 bg-white/[0.04] text-slate-300";
 }
 
-function formatRecentJobsCount(recentJobs: RecentJob[]) {
-  const count = recentJobs.length;
+function formatJobCount(jobHistory: JobSession[]) {
+  const count = jobHistory.length;
   return `${count} ${count === 1 ? "job" : "jobs"}`;
 }
 
-function formatRecentJobTime(submittedAt: string) {
+function formatJobTime(submittedAt: string) {
   const parsedDate = new Date(submittedAt);
 
   if (Number.isNaN(parsedDate.valueOf())) {
@@ -86,26 +42,35 @@ function formatRecentJobTime(submittedAt: string) {
   }).format(parsedDate);
 }
 
-export function DashboardSidebar({
-  activeJob,
-  activeJobId,
-  isPolling,
-  isSubmitting,
-  onClearHistory,
-  pollingError,
-  recentJobs,
-  submitError,
-}: DashboardSidebarProps) {
-  const statusLabel = getStatusLabel(
-    activeJob,
-    isSubmitting,
-    isPolling,
-    submitError,
-    pollingError,
-  );
-  const statusTone = getStatusTone(statusLabel);
-  const latestError = submitError ?? pollingError;
+function getJobTitle(session: JobSession) {
+  if (session.jobId) {
+    return `Job ${session.jobId.slice(0, 8)}`;
+  }
 
+  return session.status === "failed" ? "Failed Submission" : "Pending Run";
+}
+
+function getJobSubtitle(session: JobSession) {
+  if (session.jobId) {
+    return `Job ID ${session.jobId}`;
+  }
+
+  return "Waiting for backend job ID";
+}
+
+type DashboardSidebarProps = {
+  activeTabId: string;
+  jobHistory: JobSession[];
+  onClearHistory: () => void | Promise<void>;
+  onOpenJob: (sessionId: string) => void;
+};
+
+export function DashboardSidebar({
+  activeTabId,
+  jobHistory,
+  onClearHistory,
+  onOpenJob,
+}: DashboardSidebarProps) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
       <Panel className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-4">
@@ -114,11 +79,11 @@ export function DashboardSidebar({
             <h2 className="text-2xl font-semibold tracking-tight text-white">
               Recent Jobs
             </h2>
-            <span className="text-xs text-slate-500">{formatRecentJobsCount(recentJobs)}</span>
+            <span className="text-xs text-slate-500">{formatJobCount(jobHistory)}</span>
           </div>
           <button
             className="shrink-0 rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300 transition hover:border-rose-300/30 hover:bg-rose-500/10 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={recentJobs.length === 0}
+            disabled={jobHistory.length === 0}
             onClick={() => void onClearHistory()}
             type="button"
           >
@@ -127,49 +92,54 @@ export function DashboardSidebar({
         </div>
 
         <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
-          {recentJobs.length ? (
+          {jobHistory.length ? (
             <div className="space-y-3">
-              {recentJobs.map((job, index) => {
-                const isHighlighted = job.id === activeJobId || (!activeJobId && index === 0);
-                const tone = getStatusTone(job.status);
+              {jobHistory.map((session) => {
+                const isActive = activeTabId === session.id;
+                const tone = getStatusTone(session.status);
 
                 return (
-                  <article
-                    className={`rounded-[16px] border px-4 py-4 transition ${
-                      isHighlighted
+                  <button
+                    className={`w-full rounded-[16px] border px-4 py-4 text-left transition ${
+                      isActive
                         ? "border-sky-400/45 bg-sky-500/10 shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
-                        : "border-white/8 bg-white/[0.03]"
+                        : "border-white/8 bg-white/[0.03] hover:border-white/14 hover:bg-white/[0.05]"
                     }`}
-                    key={job.id}
+                    key={session.id}
+                    onClick={() => onOpenJob(session.id)}
+                    type="button"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-lg font-semibold text-white">{job.name}</p>
-                        <p className="mt-2 break-all text-sm text-slate-400">{job.run}</p>
+                        <p className="truncate text-lg font-semibold text-white">
+                          {getJobTitle(session)}
+                        </p>
+                        <p className="mt-2 break-all text-sm text-slate-400">
+                          {getJobSubtitle(session)}
+                        </p>
                       </div>
                       <span
                         className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${tone}`}
                       >
-                        {job.status}
+                        {getStatusLabel(session.status)}
                       </span>
                     </div>
                     <div className="mt-4 flex items-center justify-between gap-3 text-sm text-slate-400">
                       <span>Cloud execution</span>
-                      <span className="shrink-0">{formatRecentJobTime(job.submittedAt)}</span>
+                      <span className="shrink-0">{formatJobTime(session.submittedAt)}</span>
                     </div>
-                  </article>
+                  </button>
                 );
               })}
             </div>
           ) : (
             <div className="flex min-h-full items-center justify-center rounded-[16px] border border-dashed border-white/10 bg-white/[0.02] px-5 py-8">
               <EmptyState
-                description="Recent jobs will stack here after your first run."
+                description="Run a job to create a session and keep it in history."
                 title="No recent jobs"
               />
             </div>
           )}
-
         </div>
       </Panel>
     </div>

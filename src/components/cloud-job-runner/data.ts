@@ -1,3 +1,5 @@
+import { type DashboardJob } from "@/components/cloud-job-runner/job-api";
+
 export type DashboardFileKind = "python" | "text";
 
 export type DashboardFile = {
@@ -9,12 +11,27 @@ export type DashboardFile = {
   content: string;
 };
 
-export type RecentJob = {
+export const DRAFT_TAB_ID = "draft";
+
+export type JobSessionStatus =
+  | "pending"
+  | "submitted"
+  | "running"
+  | "completed"
+  | "failed"
+  | "poll_failed";
+
+export type JobSession = {
   id: string;
-  name: string;
-  run: string;
+  jobId: string | null;
+  codeSnapshot: string;
   submittedAt: string;
-  status: string;
+  status: JobSessionStatus;
+  logs: string;
+  result: unknown;
+  error: unknown;
+  details: DashboardJob | null;
+  isPolling: boolean;
 };
 
 export const dashboardFiles: DashboardFile[] = [
