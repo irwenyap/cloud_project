@@ -99,8 +99,10 @@ function createSessionId() {
 function buildNewSession(codeSnapshot: string): JobSession {
   return {
     codeSnapshot,
+    completedAt: null,
     details: null,
     error: null,
+    hasUnseenCompletion: false,
     id: createSessionId(),
     isPolling: false,
     jobId: null,
@@ -129,6 +131,7 @@ function isJobSession(value: unknown): value is JobSession {
     typeof value.id === "string" &&
     (typeof value.jobId === "string" || value.jobId === null) &&
     typeof value.codeSnapshot === "string" &&
+    (typeof value.completedAt === "string" || value.completedAt === null || value.completedAt === undefined) &&
     typeof value.submittedAt === "string" &&
     typeof value.status === "string" &&
     typeof value.logs === "string" &&
@@ -187,10 +190,17 @@ function readStoredWorkspaceState(): PersistedWorkspaceState {
           sessionId,
           {
             ...session,
+            completedAt:
+              typeof session.completedAt === "string" && session.completedAt.trim()
+                ? session.completedAt
+                : isTerminalSessionStatus(normalizedStatus)
+                  ? session.submittedAt
+                  : null,
             error:
               !session.jobId && !isTerminalSessionStatus(normalizedStatus)
                 ? "This session was interrupted before the backend returned a job ID."
                 : session.error,
+            hasUnseenCompletion: Boolean(session.hasUnseenCompletion),
             isPolling: session.jobId ? !isTerminalSessionStatus(normalizedStatus) : false,
             status:
               !session.jobId && !isTerminalSessionStatus(normalizedStatus)
@@ -323,16 +333,44 @@ export function useJobExecution() {
       );
       const isTerminal = isTerminalSessionStatus(nextStatus);
 
-      updateSession(sessionId, (session) => ({
-        ...session,
-        details: nextJob,
-        error: nextJob.error ?? session.error,
-        isPolling: !isTerminal,
-        jobId,
-        logs: extractLogs(nextJob, session.logs),
-        result: nextJob.result ?? session.result,
-        status: nextStatus,
-      }));
+      setState((currentState) => {
+        const session = currentState.jobsById[sessionId];
+
+        if (!session) {
+          return currentState;
+        }
+
+        const completedAt =
+          isTerminal
+            ? session.completedAt ?? new Date().toISOString()
+            : null;
+
+        const shouldMarkAsUnseen =
+          isTerminal &&
+          !isTerminalSessionStatus(session.status) &&
+          currentState.activeTabId !== sessionId;
+
+        return {
+          ...currentState,
+          jobsById: {
+            ...currentState.jobsById,
+            [sessionId]: {
+              ...session,
+              completedAt,
+              details: nextJob,
+              error: nextJob.error ?? session.error,
+              hasUnseenCompletion: shouldMarkAsUnseen
+                ? true
+                : session.hasUnseenCompletion,
+              isPolling: !isTerminal,
+              jobId,
+              logs: extractLogs(nextJob, session.logs),
+              result: nextJob.result ?? session.result,
+              status: nextStatus,
+            },
+          },
+        };
+      });
 
       pollControllersRef.current.delete(sessionId);
 
@@ -353,12 +391,29 @@ export function useJobExecution() {
 
       pollControllersRef.current.delete(sessionId);
 
-      updateSession(sessionId, (session) => ({
-        ...session,
-        error: getErrorMessage(error, "Unable to refresh the latest job state."),
-        isPolling: false,
-        status: "poll_failed",
-      }));
+      setState((currentState) => {
+        const session = currentState.jobsById[sessionId];
+
+        if (!session) {
+          return currentState;
+        }
+
+        return {
+          ...currentState,
+          jobsById: {
+            ...currentState.jobsById,
+            [sessionId]: {
+              ...session,
+              completedAt: session.completedAt ?? new Date().toISOString(),
+              error: getErrorMessage(error, "Unable to refresh the latest job state."),
+              hasUnseenCompletion:
+                currentState.activeTabId !== sessionId ? true : session.hasUnseenCompletion,
+              isPolling: false,
+              status: "poll_failed",
+            },
+          },
+        };
+      });
     }
   };
 
@@ -391,10 +446,22 @@ export function useJobExecution() {
         return currentState;
       }
 
-      return {
+      const nextState = {
         ...currentState,
         activeTabId: tabId,
       };
+
+      if (tabId !== DRAFT_TAB_ID && nextState.jobsById[tabId]?.hasUnseenCompletion) {
+        nextState.jobsById = {
+          ...nextState.jobsById,
+          [tabId]: {
+            ...nextState.jobsById[tabId],
+            hasUnseenCompletion: false,
+          },
+        };
+      }
+
+      return nextState;
     });
   };
 
@@ -404,11 +471,23 @@ export function useJobExecution() {
         return currentState;
       }
 
-      return {
+      const nextState = {
         ...currentState,
         activeTabId: sessionId,
         openTabs: upsertOpenTab(currentState.openTabs, sessionId),
       };
+
+      if (nextState.jobsById[sessionId]?.hasUnseenCompletion) {
+        nextState.jobsById = {
+          ...nextState.jobsById,
+          [sessionId]: {
+            ...nextState.jobsById[sessionId],
+            hasUnseenCompletion: false,
+          },
+        };
+      }
+
+      return nextState;
     });
   };
 
@@ -446,7 +525,6 @@ export function useJobExecution() {
 
     setState((currentState) => ({
       ...currentState,
-      activeTabId: nextSession.id,
       isSubmitting: true,
       jobOrder: [nextSession.id, ...currentState.jobOrder],
       jobsById: {
@@ -495,16 +573,32 @@ export function useJobExecution() {
 
       const errorMessage = getErrorMessage(error, "Unable to submit the job.");
 
-      updateSession(nextSession.id, (session) => ({
-        ...session,
-        error: errorMessage,
-        isPolling: false,
-        status: "failed",
-      }));
-      setState((currentState) => ({
-        ...currentState,
-        isSubmitting: false,
-      }));
+      setState((currentState) => {
+        const session = currentState.jobsById[nextSession.id];
+
+        if (!session) {
+          return currentState;
+        }
+
+        return {
+          ...currentState,
+          jobsById: {
+            ...currentState.jobsById,
+            [nextSession.id]: {
+              ...session,
+              completedAt: session.completedAt ?? new Date().toISOString(),
+              error: errorMessage,
+              hasUnseenCompletion:
+                currentState.activeTabId !== nextSession.id
+                  ? true
+                  : session.hasUnseenCompletion,
+              isPolling: false,
+              status: "failed",
+            },
+          },
+          isSubmitting: false,
+        };
+      });
     }
   };
 

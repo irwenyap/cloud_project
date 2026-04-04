@@ -42,6 +42,22 @@ function formatJobTime(submittedAt: string) {
   }).format(parsedDate);
 }
 
+function formatExecutionDuration(session: JobSession) {
+  const submittedAt = new Date(session.submittedAt);
+  const endTime = new Date(session.completedAt ?? new Date().toISOString());
+
+  if (Number.isNaN(submittedAt.valueOf()) || Number.isNaN(endTime.valueOf())) {
+    return "--";
+  }
+
+  const durationInSeconds = Math.max(
+    0,
+    Math.round((endTime.getTime() - submittedAt.getTime()) / 1000),
+  );
+
+  return `${durationInSeconds}s`;
+}
+
 function getJobTitle(session: JobSession) {
   if (session.jobId) {
     return `Job ${session.jobId.slice(0, 8)}`;
@@ -97,12 +113,15 @@ export function DashboardSidebar({
               {jobHistory.map((session) => {
                 const isActive = activeTabId === session.id;
                 const tone = getStatusTone(session.status);
+                const showCompletionHighlight = session.hasUnseenCompletion && !isActive;
 
                 return (
                   <button
                     className={`w-full rounded-[16px] border px-4 py-4 text-left transition ${
                       isActive
                         ? "border-sky-400/45 bg-sky-500/10 shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
+                        : showCompletionHighlight
+                          ? "border-amber-300/65 bg-amber-400/[0.05] shadow-[0_0_0_1px_rgba(253,224,71,0.3),0_0_28px_rgba(253,224,71,0.18)] hover:border-amber-200/80 hover:bg-amber-400/[0.08]"
                         : "border-white/8 bg-white/[0.03] hover:border-white/14 hover:bg-white/[0.05]"
                     }`}
                     key={session.id}
@@ -125,7 +144,7 @@ export function DashboardSidebar({
                       </span>
                     </div>
                     <div className="mt-4 flex items-center justify-between gap-3 text-sm text-slate-400">
-                      <span>Cloud execution</span>
+                      <span>{formatExecutionDuration(session)}</span>
                       <span className="shrink-0">{formatJobTime(session.submittedAt)}</span>
                     </div>
                   </button>

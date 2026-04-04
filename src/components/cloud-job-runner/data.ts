@@ -26,12 +26,14 @@ export type JobSession = {
   jobId: string | null;
   codeSnapshot: string;
   submittedAt: string;
+  completedAt: string | null;
   status: JobSessionStatus;
   logs: string;
   result: unknown;
   error: unknown;
   details: DashboardJob | null;
   isPolling: boolean;
+  hasUnseenCompletion: boolean;
 };
 
 export const dashboardFiles: DashboardFile[] = [
