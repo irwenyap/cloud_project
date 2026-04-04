@@ -118,7 +118,7 @@ export function DashboardOutputPanel({
   const detailsValue = activeSession ? buildDetailsValue(activeSession) : "";
 
   return (
-    <Panel className="flex h-full min-h-0 flex-col overflow-hidden p-4 sm:p-5 xl:col-auto lg:col-span-2">
+    <Panel className="relative z-10 flex h-full min-h-0 flex-col overflow-hidden border-l p-4 sm:p-5 xl:col-auto lg:col-span-2" variant="raised">
       <div className="shrink-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-slate-400">
           Console

@@ -225,7 +225,7 @@ export function DashboardEditorPanel({
   };
 
   return (
-    <Panel className="flex h-full min-h-0 flex-col overflow-hidden p-4 sm:p-5">
+    <Panel className="flex h-full min-h-0 flex-col overflow-hidden border-x p-4 sm:p-5" variant="sunken">
       <div className="shrink-0 border-b border-white/8 pb-4">
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           <button

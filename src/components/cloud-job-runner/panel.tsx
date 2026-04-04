@@ -1,15 +1,24 @@
 import type { ReactNode } from "react";
 
-const panelClassName =
-  "rounded-[20px] border border-white/8 bg-white/[0.045] shadow-[0_30px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl";
+const panelVariants = {
+  raised:
+    "border border-white/8 bg-[linear-gradient(180deg,rgba(18,24,34,0.96),rgba(11,15,22,0.94))] shadow-[0_10px_22px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl",
+  sunken:
+    "border border-white/6 bg-[linear-gradient(180deg,rgba(8,11,17,0.98),rgba(10,14,21,0.96))] shadow-[inset_0_1px_0_rgba(255,255,255,0.03),inset_0_18px_40px_rgba(0,0,0,0.3),inset_0_-10px_24px_rgba(255,255,255,0.02)] backdrop-blur-xl",
+} as const;
 
 type PanelProps = {
   children: ReactNode;
   className?: string;
+  variant?: keyof typeof panelVariants;
 };
 
-export function Panel({ children, className = "" }: PanelProps) {
-  return <section className={`${panelClassName} ${className}`}>{children}</section>;
+export function Panel({
+  children,
+  className = "",
+  variant = "raised",
+}: PanelProps) {
+  return <section className={`${panelVariants[variant]} ${className}`}>{children}</section>;
 }
 
 type ControlIconProps = {

@@ -89,7 +89,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
-      <Panel className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-4">
+      <Panel className="relative z-10 flex h-full min-h-0 flex-1 flex-col overflow-hidden border-r p-4" variant="raised">
         <div className="flex shrink-0 items-center justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-2xl font-semibold tracking-tight text-white">
