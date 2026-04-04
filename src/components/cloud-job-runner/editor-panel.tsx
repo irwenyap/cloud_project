@@ -10,8 +10,8 @@ import {
   type DashboardFileKind,
   type JobSession,
 } from "@/components/cloud-job-runner/data";
-import { CloseIcon, CogIcon, FileGlyph, PlusIcon } from "@/components/cloud-job-runner/icons";
-import { ControlIcon, Panel } from "@/components/cloud-job-runner/panel";
+import { CloseIcon, FileGlyph, PlusIcon } from "@/components/cloud-job-runner/icons";
+import { Panel } from "@/components/cloud-job-runner/panel";
 import { MonacoCodeEditor } from "@/components/monaco-code-editor";
 
 const fileTypeOptions: Array<{ kind: DashboardFileKind; label: string }> = [
@@ -301,13 +301,10 @@ export function DashboardEditorPanel({
                 type="button"
                 onClick={() => void onRun(activeFile.content)}
                 disabled={isSubmitting}
-                className="rounded-[14px] border border-sky-300/20 bg-[linear-gradient(180deg,#2f91ff,#1768d6)] px-5 py-3 text-sm font-semibold text-white shadow-[0_20px_30px_rgba(22,104,214,0.35)] transition hover:brightness-105 disabled:cursor-wait disabled:opacity-75"
+                className="inline-flex min-w-[120px] items-center justify-center rounded-[12px] border border-sky-400/30 bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:cursor-wait disabled:border-sky-500/20 disabled:bg-sky-500/70 disabled:text-white/80"
               >
                 {isSubmitting ? "Submitting..." : "Run Job"}
               </button>
-              <ControlIcon>
-                <CogIcon />
-              </ControlIcon>
             </div>
           </div>
 
