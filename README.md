@@ -4,6 +4,12 @@ A distributed system for submitting and executing code jobs using AWS services, 
 
 ---
 
+## Demo
+Video: CSD3156_CloudDemo.mp4
+Link: http://cloudprojectalbsecuritygroup-1531546705.us-east-1.elb.amazonaws.com/
+
+---
+
 ## Features
 
 - Submit and execute code jobs via web UI  
